@@ -19,7 +19,7 @@ impl MortgageSchedule {
   fn payment_amount_equation(&self) -> f64 {
       self.principal * (self.top_half() / self.bottom_half())
   }
-  pub fn run_schedule(&mut self) -> Result<(f64, f64), Box<dyn Error>> {
+  pub fn run_schedule(&mut self) -> Result<(f64, f64, u32), Box<dyn Error>> {
       
       let minimum_payment_amount = self.payment_amount_equation();
       println!("\nRunning schedule for overpayment amount £{}, monthly cost £{}",
@@ -62,7 +62,7 @@ impl MortgageSchedule {
               break;
           }
       }
-      Ok((round(total_repayment_cost, 2), round(total_interest_paid, 2)))
+      Ok((round(total_repayment_cost, 2), round(total_interest_paid, 2), payment_count))
   }
 }
 
@@ -72,7 +72,7 @@ mod tests {
 
   #[test]
   fn small_loan_with_annual_rate() {
-    let Ok((total_cost, total_interest)) = MortgageSchedule {
+    let Ok((total_cost, total_interest, years_to_repay)) = MortgageSchedule {
       principal: 10000.0, // £10k value
       overpayment_amount: 0.0,
       running_principal: 10000.0,
@@ -81,13 +81,13 @@ mod tests {
     }.run_schedule() else { return; };
 
     assert_eq!(total_cost, 10607.92);
-    assert_eq!(total_interest, 607.92)
-
+    assert_eq!(total_interest, 607.92);
+    assert_eq!(years_to_repay, 5);
   }
   
   #[test]
   fn calculates_mortgage_without_overpaying() {
-    let Ok((total_cost, total_interest)) = MortgageSchedule {
+    let Ok((total_cost, total_interest, months_to_repay)) = MortgageSchedule {
       principal: 100000.0, // £100k value
       overpayment_amount: 0.0,
       running_principal: 100000.0,
@@ -96,12 +96,13 @@ mod tests {
     }.run_schedule() else { return; };
 
     assert_eq!(total_cost, 139130.36);
-    assert_eq!(total_interest, 39130.36)
+    assert_eq!(total_interest, 39130.36);
+    assert_eq!(months_to_repay, 420);
   }
 
   #[test]
   fn calculates_mortgage_with_overpaying() {
-    let Ok((total_cost, total_interest)) = MortgageSchedule {
+    let Ok((total_cost, total_interest, months_to_repay)) = MortgageSchedule {
       principal: 100000.0, // £100k value
       overpayment_amount: 100.0, // £100 overpayment per month
       running_principal: 100000.0,
@@ -111,11 +112,12 @@ mod tests {
 
     assert_eq!(total_cost, 126791.25);
     assert_eq!(total_interest, 26511.89);
+    assert_eq!(months_to_repay, 294);
   }
 
   #[test]
   fn calculates_mortgage_without_overpaying_2() {
-    let Ok((total_cost, total_interest)) = MortgageSchedule {
+    let Ok((total_cost, total_interest, months_to_repay)) = MortgageSchedule {
       principal: 300000.0, // £300k value
       overpayment_amount: 0.0,
       running_principal: 300000.0,
@@ -125,11 +127,12 @@ mod tests {
 
     assert_eq!(total_cost, 515608.52);
     assert_eq!(total_interest, 215608.52);
+    assert_eq!(months_to_repay, 360);
   }
 
   #[test]
   fn calculates_mortgage_with_overpaying_2() {
-    let Ok((total_cost, total_interest)) = MortgageSchedule {
+    let Ok((total_cost, total_interest, months_to_repay)) = MortgageSchedule {
       principal: 300000.0, // £300k value
       overpayment_amount: 100.0,
       running_principal: 300000.0,
@@ -139,5 +142,6 @@ mod tests {
 
     assert_eq!(total_cost, 487254.19);
     assert_eq!(total_interest, 186861.93);
+    assert_eq!(months_to_repay, 318);
   }
 }

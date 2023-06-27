@@ -21,7 +21,7 @@ fn main() {
         0.0
     );
 
-    let Ok((total_repayment_cost, total_interest_paid)) = mortgage_1.run_schedule() else { return; };
+    let Ok((_total_repayment_cost, total_interest_paid, total_time_taken)) = mortgage_1.run_schedule() else { return; };
 
     let mut mortgage_2 = build_mortgage(
         mp.principal, 
@@ -31,11 +31,12 @@ fn main() {
     );
 
     match mortgage_2.run_schedule() {
-        Ok((op_total_repayment_cost, op_total_interest_paid)) => {
-            let total_payment_savings = total_repayment_cost - op_total_repayment_cost;
+        Ok((_op_total_repayment_cost, op_total_interest_paid, op_total_time_taken)) => {
+            let time_saved = total_time_taken - op_total_time_taken;
             let interest_saved = total_interest_paid - op_total_interest_paid;
-            println!("\nTotal amount saved: £{}", round(total_payment_savings, 2));
-            println!("\nInterest saved: £{}", round(interest_saved, 2));
+
+            println!("\nTime saved: {} years {} months", time_saved / 12, time_saved % 12);
+            println!("Interest saved: £{}", round(interest_saved, 2));
         },
         Err(e) => {
             println!("Application error: {e}");

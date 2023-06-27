@@ -27,7 +27,6 @@ Mortgage paid in 25 years, 6 months
 Total Interest Paid: £129499.39
 Total Amount Paid: £429792.47
 
-Total amount saved: £55118.76
-
+Time saved: 9 years 6 months
 Interest saved: £55411.85
 ```
